@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inscripciones · Torneos Assetto Corsa</title>
+  <meta name="description" content="Sistema de inscripción de pilotos para los torneos de Assetto Corsa. Seleccioná tu auto y registrate." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #090b12;
+      --surface:  #111420;
+      --card:     #161927;
+      --card-h:   #1c2035;
+      --accent:   #e84118;
+      --accent2:  #ff7f50;
+      --green:    #22c55e;
+      --yellow:   #f59e0b;
+      --text:     #eef0f8;
+      --muted:    #6b7494;
+      --border:   rgba(255,255,255,0.07);
+      --glow-r:   0 0 28px rgba(232,65,24,0.35);
+      --glow-g:   0 0 20px rgba(34,197,94,0.25);
+      --r:        14px;
+      --t:        0.28s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; padding: 56px 24px 44px; text-align: center; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 55% at 50% 0%, rgba(232,65,24,0.16) 0%, transparent 70%),
+                  radial-gradient(ellipse 35% 35% at 85% 90%, rgba(255,127,80,0.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--accent); border: 1px solid rgba(232,65,24,0.5); border-radius: 100px;
+      padding: 5px 14px; margin-bottom: 18px;
+    }
+    .hero-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 1.4s infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.4; transform:scale(.7); } }
+    .hero h1 {
+      font-size: clamp(2rem, 5.5vw, 3.8rem); font-weight: 800; line-height: 1.1;
+      background: linear-gradient(135deg, #fff 25%, var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero p { margin-top: 10px; color: var(--muted); font-size: 0.95rem; }
+
+    /* ── STATS BAR ── */
+    .stats {
+      display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
+      padding: 0 24px 36px;
+    }
+    .stat-pill {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 100px;
+      padding: 8px 18px; font-size: 0.85rem;
+    }
+    .stat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .stat-dot.all   { background: var(--accent2); }
+    .stat-dot.free  { background: var(--green); }
+    .stat-dot.taken { background: var(--accent); }
+    .stat-pill strong { font-weight: 700; }
+
+    /* ── TOOLBAR ── */
+    .toolbar {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      padding: 0 clamp(16px, 5vw, 72px) 24px;
+    }
+    .search-wrap { flex: 1; min-width: 180px; position: relative; }
+    .search-wrap svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+    #searchInput {
+      width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 100px;
+      color: var(--text); font-family: inherit; font-size: 0.88rem; padding: 9px 16px 9px 40px;
+      outline: none; transition: border-color var(--t);
+    }
+    #searchInput:focus { border-color: var(--accent); }
+    #searchInput::placeholder { color: var(--muted); }
+    .filter-btns { display: flex; gap: 6px; }
+    .filter-btn {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 100px;
+      color: var(--muted); cursor: pointer; font-family: inherit; font-size: 0.8rem; font-weight: 600;
+      padding: 8px 16px; transition: all var(--t); white-space: nowrap;
+    }
+    .filter-btn.active, .filter-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(232,65,24,0.1); }
+    .filter-btn.free.active, .filter-btn.free:hover { border-color: var(--green); color: var(--green); background: rgba(34,197,94,0.1); }
+
+    /* ── GRID ── */
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 18px;
+      padding: 0 clamp(16px, 5vw, 72px) 24px;
+    }
+
+    /* ── CAR CARD ── */
+    .car-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--r);
+      overflow: hidden; position: relative;
+      transition: transform var(--t), box-shadow var(--t), border-color var(--t);
+      animation: fadeUp 0.35s both;
+    }
+    .car-card.libre { cursor: pointer; }
+    .car-card.libre:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--glow-g), 0 16px 40px rgba(0,0,0,0.5);
+      border-color: rgba(34,197,94,0.4);
+    }
+    .car-card.ocupado { opacity: 0.72; }
+    .car-card.ocupado:hover { transform: translateY(-2px); border-color: rgba(232,65,24,0.3); }
+
+    .card-img-wrap { position: relative; overflow: hidden; }
+    .card-img {
+      width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block;
+      background: var(--surface); transition: transform var(--t);
+    }
+    .car-card.libre:hover .card-img { transform: scale(1.05); }
+    .num-badge {
+      position: absolute; top: 10px; left: 10px;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 3px 10px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em;
+    }
+    .status-badge {
+      position: absolute; top: 10px; right: 10px;
+      border-radius: 100px; padding: 3px 10px; font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .status-badge.libre  { background: rgba(34,197,94,0.2); color: var(--green); border: 1px solid rgba(34,197,94,0.4); }
+    .status-badge.ocupado { background: rgba(232,65,24,0.2); color: var(--accent); border: 1px solid rgba(232,65,24,0.4); }
+
+    .card-body { padding: 14px 16px; }
+    .card-title { font-size: 0.95rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-sub   { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+    .card-pilot {
+      margin-top: 10px; padding: 8px 12px;
+      background: rgba(232,65,24,0.08); border: 1px solid rgba(232,65,24,0.15); border-radius: 8px;
+      font-size: 0.8rem;
+    }
+    .card-pilot-name { font-weight: 700; color: var(--accent2); }
+    .card-pilot-steam { font-size: 0.72rem; color: var(--muted); margin-top: 1px; font-family: monospace; }
+
+    .card-cta {
+      margin-top: 12px; width: 100%; background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 8px; color: var(--green); font-family: inherit; font-size: 0.85rem; font-weight: 700;
+      padding: 9px; cursor: pointer; transition: all var(--t); letter-spacing: 0.03em;
+    }
+    .card-cta:hover { background: rgba(34,197,94,0.22); box-shadow: var(--glow-g); }
+
+    /* ── PILOTOS TABLE ── */
+    .pilots-section { padding: 40px clamp(16px, 5vw, 72px) 64px; }
+    .section-title {
+      font-size: 1.3rem; font-weight: 800; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-title::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    .pilots-table-wrap { overflow-x: auto; border-radius: var(--r); border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    thead { background: var(--surface); }
+    th { padding: 12px 16px; text-align: left; font-weight: 600; color: var(--muted); font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tbody tr { background: var(--card); transition: background var(--t); }
+    tbody tr:hover { background: var(--card-h); }
+    .t-thumb { width: 54px; height: 34px; object-fit: cover; border-radius: 6px; display: block; background: var(--surface); }
+    .t-num  { font-weight: 800; color: var(--accent2); }
+    .t-pilot { font-weight: 600; }
+    .t-steam { font-family: monospace; font-size: 0.78rem; color: var(--muted); }
+    .btn-delete {
+      background: none; border: 1px solid rgba(232,65,24,0.3); border-radius: 7px;
+      color: var(--accent); cursor: pointer; font-size: 0.78rem; padding: 5px 11px;
+      transition: all var(--t); font-family: inherit; font-weight: 600;
+    }
+    .btn-delete:hover { background: rgba(232,65,24,0.15); border-color: var(--accent); }
+    .empty-state { text-align: center; padding: 40px; color: var(--muted); font-size: 0.9rem; }
+
+    /* ── MODAL ── */
+    #modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.82); backdrop-filter: blur(14px);
+      display: flex; align-items: center; justify-content: center; z-index: 900; padding: 24px;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+    }
+    #modal.open { opacity: 1; pointer-events: all; }
+    .modal-box {
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+      width: 100%; max-width: 760px; max-height: 90vh; overflow-y: auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+      transform: scale(0.95); transition: transform 0.25s ease;
+    }
+    #modal.open .modal-box { transform: scale(1); }
+
+    .modal-left {
+      background: var(--surface); border-radius: 20px 0 0 20px; padding: 32px 28px;
+      display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden;
+    }
+    .modal-left::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,65,24,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    #modalImg { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 12px; border: 1px solid var(--border); }
+    #modalNum { font-size: 2.2rem; font-weight: 800; color: var(--accent2); line-height: 1; }
+    #modalNombre { font-size: 1.1rem; font-weight: 700; }
+    #modalMarca { font-size: 0.85rem; color: var(--muted); }
+    #modalArchivo { font-size: 0.72rem; color: var(--muted); font-family: monospace; }
+
+    .modal-right { padding: 32px 28px; display: flex; flex-direction: column; gap: 20px; }
+    .modal-header { display: flex; justify-content: space-between; align-items: flex-start; }
+    .modal-title { font-size: 1.2rem; font-weight: 800; }
+    .modal-sub   { font-size: 0.82rem; color: var(--muted); margin-top: 4px; }
+    #btnClose {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      font-size: 1.4rem; padding: 2px 6px; border-radius: 6px; transition: all var(--t); line-height: 1;
+    }
+    #btnClose:hover { color: var(--text); background: var(--surface); }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    .form-input {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text); font-family: inherit; font-size: 0.92rem; padding: 11px 14px;
+      outline: none; transition: border-color var(--t), box-shadow var(--t);
+    }
+    .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,65,24,0.12); }
+    .form-input::placeholder { color: var(--muted); }
+    .form-hint { font-size: 0.72rem; color: var(--muted); }
+
+    #errorMsg {
+      background: rgba(232,65,24,0.1); border: 1px solid rgba(232,65,24,0.3);
+      border-radius: 8px; padding: 10px 14px; font-size: 0.82rem; color: var(--accent);
+      display: none;
+    }
+    #errorMsg.show { display: block; }
+
+    #btnSubmit {
+      width: 100%; background: linear-gradient(135deg, var(--accent), #c0392b);
+      border: none; border-radius: 10px; color: #fff; cursor: pointer; font-family: inherit;
+      font-size: 0.95rem; font-weight: 700; padding: 13px; letter-spacing: 0.03em;
+      transition: all var(--t); position: relative; overflow: hidden;
+    }
+    #btnSubmit:hover { transform: translateY(-2px); box-shadow: var(--glow-r); }
+    #btnSubmit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .terms { font-size: 0.72rem; color: var(--muted); text-align: center; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+      background: var(--green); color: #fff; font-weight: 700; font-size: 0.88rem;
+      padding: 12px 20px; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      transform: translateY(80px); opacity: 0; transition: all 0.3s ease; pointer-events: none;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.error { background: var(--accent); }
+
+    /* ── LOADER ── */
+    .loader { grid-column: 1/-1; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 60px; color: var(--muted); }
+    .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.75s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 620px) {
+      .modal-box { grid-template-columns: 1fr; max-height: 95vh; }
+      .modal-left { border-radius: 20px 20px 0 0; padding: 24px 20px; }
+      .modal-right { padding: 24px 20px; }
+      #modalNum { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-tag">En vivo · Assetto Corsa</div>
+  <h1>Inscripciones al Torneo</h1>
+  <p>Seleccioná tu auto y completá el formulario con tus datos para participar</p>
+</header>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat-pill"><span class="stat-dot all"></span> Total: <strong id="statTotal">—</strong> autos</div>
+  <div class="stat-pill"><span class="stat-dot free"></span> Libres: <strong id="statLibres">—</strong></div>
+  <div class="stat-pill"><span class="stat-dot taken"></span> Inscriptos: <strong id="statTomados">—</strong></div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="search-wrap">
+    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input id="searchInput" type="search" placeholder="Buscar por número, nombre o marca…" />
+  </div>
+  <div class="filter-btns">
+    <button class="filter-btn active" id="fAll"  onclick="setFilter('all')">Todos</button>
+    <button class="filter-btn free"   id="fFree" onclick="setFilter('libre')">Libres</button>
+    <button class="filter-btn"       id="fTaken" onclick="setFilter('ocupado')">Inscriptos</button>
+  </div>
+</div>
+
+<!-- CAR GRID -->
+<main id="grid">
+  <div class="loader"><div class="spinner"></div><span>Cargando autos…</span></div>
+</main>
+
+<!-- PILOTS TABLE -->
+<section class="pilots-section">
+  <h2 class="section-title">🏁 Pilotos Inscriptos</h2>
+  <div class="pilots-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Auto</th>
+          <th>Imagen</th>
+          <th>Nombre del Piloto</th>
+          <th>Steam ID</th>
+          <th>Marca / Modelo</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="pilotsBody">
+        <tr><td colspan="6" class="empty-state">Aún no hay inscripciones.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- MODAL -->
+<div id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-box">
+    <div class="modal-left">
+      <img id="modalImg" src="" alt="" />
+      <div>
+        <div id="modalNum">#—</div>
+        <div id="modalNombre">—</div>
+        <div id="modalMarca">—</div>
+        <div id="modalArchivo">—</div>
+      </div>
+    </div>
+    <div class="modal-right">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="modal-title">Formulario de Inscripción</div>
+          <div class="modal-sub">Completá tus datos para reservar este auto</div>
+        </div>
+        <button id="btnClose" aria-label="Cerrar">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="inputNombre">Nombre del Piloto</label>
+        <input class="form-input" type="text" id="inputNombre" placeholder="Ej: Juan Pérez" autocomplete="name" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="inputSteam">Steam ID</label>
+        <input class="form-input" type="text" id="inputSteam" placeholder="Ej: 76561198012345678" autocomplete="off" />
+        <span class="form-hint">Podés encontrarlo en <strong>steamcommunity.com/id/…</strong> → URL → tu ID numérico</span>
+      </div>
+
+      <div id="errorMsg" role="alert"></div>
+
+      <button id="btnSubmit" type="button">Inscribirme</button>
+      <p class="terms">Al inscribirte aceptás las reglas del torneo. Una inscripción por piloto.</p>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" role="status"></div>
+
+<script>
+  /* ── STATE ── */
+  let autos   = [];
+  let pilotos = [];
+  let activeFilter = 'all';
+  let selectedAuto = null;
+
+  const grid       = document.getElementById('grid');
+  const pilotsBody = document.getElementById('pilotsBody');
+  const modal      = document.getElementById('modal');
+  const searchInput= document.getElementById('searchInput');
+  const toast      = document.getElementById('toast');
+  const errorMsg   = document.getElementById('errorMsg');
+  const btnSubmit  = document.getElementById('btnSubmit');
+
+  /* ── INIT ── */
+  async function init() {
+    try {
+      const [autosRes, pilotosRes] = await Promise.all([
+        fetch('/autos.json'),
+        fetch('/api/pilotos')
+      ]);
+      autos   = await autosRes.json();
+      pilotos = await pilotosRes.json();
+      updateStats();
+      renderGrid();
+      renderTable();
+    } catch (e) {
+      grid.innerHTML = `<div class="loader" style="color:var(--accent)">⚠️ Error al cargar: ${e.message}</div>`;
+    }
+  }
+
+  /* ── HELPERS ── */
+  function getPiloto(numero) {
+    return pilotos.find(p => Number(p.autoNumero) === Number(numero)) || null;
+  }
+
+  function updateStats() {
+    const tomados = pilotos.length;
+    document.getElementById('statTotal').textContent  = autos.length;
+    document.getElementById('statLibres').textContent = autos.length - tomados;
+    document.getElementById('statTomados').textContent= tomados;
+  }
+
+  function getFiltered() {
+    const q = searchInput.value.trim().toLowerCase();
+    return autos.filter(a => {
+      const piloto  = getPiloto(a.numero);
+      const estado  = piloto ? 'ocupado' : 'libre';
+      if (activeFilter !== 'all' && activeFilter !== estado) return false;
+      if (!q) return true;
+      return String(a.numero).includes(q) ||
+             (a.nombre || '').toLowerCase().includes(q) ||
+             (a.marca  || '').toLowerCase().includes(q) ||
+             (piloto?.nombrePiloto || '').toLowerCase().includes(q);
+    });
+  }
+
+  /* ── GRID ── */
+  function renderGrid() {
+    const items = getFiltered();
+    if (!items.length) { grid.innerHTML = '<div class="loader" style="color:var(--muted)">Sin resultados.</div>'; return; }
+    grid.innerHTML = items.map((a, i) => {
+      const piloto = getPiloto(a.numero);
+      const estado = piloto ? 'ocupado' : 'libre';
+      const delay  = Math.min(i * 0.04, 0.5);
+      return `
+        <article class="car-card ${estado}" style="animation-delay:${delay}s"
+          ${estado === 'libre' ? `onclick="openModal(${a.numero})" role="button" tabindex="0" aria-label="Inscribirse en auto #${a.numero}"` : ''}
+          onkeydown="if(event.key==='Enter')openModal(${a.numero})">
+          <div class="card-img-wrap">
+            <img class="card-img" src="/autos/${encodeURIComponent(a.archivo)}" alt="Auto ${a.numero}" loading="lazy" />
+            <span class="num-badge">#${a.numero}</span>
+            <span class="status-badge ${estado}">${estado === 'libre' ? '✦ Libre' : '✗ Ocupado'}</span>
+          </div>
+          <div class="card-body">
+            <div class="card-title">${a.nombre || 'Sin nombre'}</div>
+            <div class="card-sub">${a.marca || 'Sin marca'} · ${a.archivo}</div>
+            ${piloto ? `
+              <div class="card-pilot">
+                <div class="card-pilot-name">🏎 ${piloto.nombrePiloto}</div>
+                <div class="card-pilot-steam">${piloto.steamId}</div>
+              </div>` : `
+              <button class="card-cta" onclick="openModal(${a.numero});event.stopPropagation()">+ Inscribirme en este auto</button>`
+            }
+          </div>
+        </article>`;
+    }).join('');
+  }
+
+  /* ── TABLE ── */
+  function renderTable() {
+    if (!pilotos.length) {
+      pilotsBody.innerHTML = '<tr><td colspan="6" class="empty-state">Aún no hay inscripciones.</td></tr>';
+      return;
+    }
+    pilotsBody.innerHTML = pilotos.map(p => `
+      <tr>
+        <td class="t-num">#${p.autoNumero}</td>
+        <td><img class="t-thumb" src="/autos/${encodeURIComponent(p.archivo)}" alt="Auto ${p.autoNumero}" loading="lazy" /></td>
+        <td class="t-pilot">${escHtml(p.nombrePiloto)}</td>
+        <td class="t-steam">${escHtml(p.steamId)}</td>
+        <td style="color:var(--muted);font-size:0.8rem">${escHtml(p.marca||'—')} ${escHtml(p.nombre||'')}</td>
+        <td><button class="btn-delete" onclick="desinscribir(${p.autoNumero},'${escHtml(p.nombrePiloto)}')">Eliminar</button></td>
+      </tr>`).join('');
+  }
+
+  function escHtml(str) {
+    return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ── FILTER ── */
+  function setFilter(f) {
+    activeFilter = f;
+    document.getElementById('fAll').classList.toggle('active', f === 'all');
+    document.getElementById('fFree').classList.toggle('active', f === 'libre');
+    document.getElementById('fTaken').classList.toggle('active', f === 'ocupado');
+    renderGrid();
+  }
+  searchInput.addEventListener('input', renderGrid);
+
+  /* ── MODAL ── */
+  function openModal(numero) {
+    selectedAuto = autos.find(a => Number(a.numero) === Number(numero));
+    if (!selectedAuto || getPiloto(numero)) return;
+    document.getElementById('modalImg').src     = `/autos/${encodeURIComponent(selectedAuto.archivo)}`;
+    document.getElementById('modalImg').alt     = `Auto ${selectedAuto.numero}`;
+    document.getElementById('modalNum').textContent     = `#${selectedAuto.numero}`;
+    document.getElementById('modalNombre').textContent  = selectedAuto.nombre  || 'Sin nombre';
+    document.getElementById('modalMarca').textContent   = selectedAuto.marca   || 'Sin marca';
+    document.getElementById('modalArchivo').textContent = selectedAuto.archivo;
+    document.getElementById('inputNombre').value = '';
+    document.getElementById('inputSteam').value  = '';
+    errorMsg.textContent = '';
+    errorMsg.classList.remove('show');
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('inputNombre').focus();
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+    selectedAuto = null;
+  }
+
+  document.getElementById('btnClose').addEventListener('click', closeModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
+
+  /* ── SUBMIT ── */
+  btnSubmit.addEventListener('click', async () => {
+    if (!selectedAuto) return;
+    const nombrePiloto = document.getElementById('inputNombre').value.trim();
+    const steamId      = document.getElementById('inputSteam').value.trim();
+    errorMsg.classList.remove('show');
+
+    if (!nombrePiloto) { showError('Ingresá tu nombre de piloto.'); return; }
+    if (!steamId)      { showError('Ingresá tu Steam ID.'); return; }
+    if (!/^\d{17}$/.test(steamId)) { showError('El Steam ID debe tener exactamente 17 dígitos.'); return; }
+
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = 'Inscribiendo…';
+    try {
+      const res = await fetch('/api/inscripcion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          autoNumero:   selectedAuto.numero,
+          archivo:      selectedAuto.archivo,
+          nombre:       selectedAuto.nombre  || '',
+          marca:        selectedAuto.marca   || '',
+          nombrePiloto, steamId
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) { showError(data.error || 'Error al inscribirse'); return; }
+      pilotos.push(data);
+      pilotos.sort((a,b) => Number(a.autoNumero) - Number(b.autoNumero));
+      updateStats(); renderGrid(); renderTable();
+      closeModal();
+      showToast(`✅ ${nombrePiloto} inscripto en el auto #${selectedAuto.numero}`);
+    } catch (e) {
+      showError('Error de conexión: ' + e.message);
+    } finally {
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = 'Inscribirme';
+    }
+  });
+
+  /* ── DELETE ── */
+  async function desinscribir(autoNumero, nombre) {
+    if (!confirm(`¿Eliminar la inscripción de ${nombre} del auto #${autoNumero}?`)) return;
+    try {
+      const res = await fetch(`/api/inscripcion/${autoNumero}`, { method: 'DELETE' });
+      if (!res.ok) { showToast('Error al eliminar', true); return; }
+      pilotos = pilotos.filter(p => Number(p.autoNumero) !== Number(autoNumero));
+      updateStats(); renderGrid(); renderTable();
+      showToast(`🗑 Inscripción del auto #${autoNumero} eliminada`);
+    } catch (e) {
+      showToast('Error de conexión', true);
+    }
+  }
+
+  /* ── TOAST / ERROR ── */
+  let toastTimer;
+  function showToast(msg, isError = false) {
+    toast.textContent = msg;
+    toast.className   = 'show' + (isError ? ' error' : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { toast.className = ''; }, 3500);
+  }
+  function showError(msg) {
+    errorMsg.textContent = msg;
+    errorMsg.classList.add('show');
+  }
+
+  init();
+</script>
+</body>
+</html>
