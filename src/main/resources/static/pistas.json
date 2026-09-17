@@ -1,0 +1,19 @@
+[
+  {
+    "numero": 1,
+    "nombre": "Callejero BsAs",
+    "ciudad": "Caba",
+	"Pais":"Argentina",
+    "archivo": "Ba.jpg",
+	"extension":"3.1 km"
+  },
+  {
+    "numero": 2,
+    "nombre": "Rivera",
+    "ciudad": "Rivera",
+"Pais":"Uruguay",
+    "archivo": "Rivera.jpg",
+	"extension":"4.3 km"
+  }
+
+]
