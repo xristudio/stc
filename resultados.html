@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resultados · Toay La Pampa H22 · Zero2 SimRacing</title>
+  <meta name="description" content="Resultados de la carrera Toay La Pampa H22 - Torneo TN C3 Assetto Corsa. Clasificación final, mejores vueltas y estadísticas de pilotos." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #090b12;
+      --surface:  #111420;
+      --card:     #161927;
+      --card-h:   #1c2035;
+      --accent:   #e84118;
+      --accent2:  #ff7f50;
+      --gold:     #f5c518;
+      --silver:   #a8b2c1;
+      --bronze:   #cd7f32;
+      --green:    #22c55e;
+      --yellow:   #f59e0b;
+      --text:     #eef0f8;
+      --muted:    #6b7494;
+      --border:   rgba(255,255,255,0.07);
+      --r:        14px;
+      --t:        0.28s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+    a { color: inherit; text-decoration: none; }
+
+    /* HERO */
+    .hero { position: relative; padding: 56px 24px 44px; text-align: center; overflow: hidden; }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 55% at 50% 0%, rgba(232,65,24,0.16) 0%, transparent 70%),
+                  radial-gradient(ellipse 35% 35% at 85% 90%, rgba(255,127,80,0.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--accent); border: 1px solid rgba(232,65,24,0.5); border-radius: 100px;
+      padding: 5px 14px; margin-bottom: 18px;
+    }
+    .hero-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 1.4s infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.4; transform:scale(.7); } }
+    .hero h1 {
+      font-size: clamp(2rem, 5.5vw, 3.6rem); font-weight: 800; line-height: 1.1;
+      background: linear-gradient(135deg, #fff 25%, var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-meta {
+      margin-top: 10px; color: var(--muted); font-size: 0.9rem;
+      display: flex; justify-content: center; align-items: center; gap: 18px; flex-wrap: wrap;
+    }
+
+    /* NAV BACK */
+    .nav-back {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin: 0 24px 0; font-size: 0.82rem; font-weight: 600;
+      color: var(--muted); border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 14px; transition: color var(--t), border-color var(--t);
+    }
+    .nav-back:hover { color: var(--accent); border-color: rgba(232,65,24,0.4); }
+
+    /* CONTAINER */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px 80px; }
+
+    /* PODIUM */
+    .podium-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; text-align: center; }
+    .podium-grid { display: grid; grid-template-columns: 1fr 1.1fr 1fr; gap: 14px; max-width: 780px; margin: 0 auto 40px; }
+    @media (max-width: 600px) { .podium-grid { grid-template-columns: 1fr; max-width: 340px; } }
+    .podium-card {
+      position: relative; background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 22px 16px 18px; text-align: center; overflow: hidden;
+      transition: transform var(--t), box-shadow var(--t);
+    }
+    .podium-card:hover { transform: translateY(-4px); }
+    .podium-card.p1 { border-color: rgba(245,197,24,0.4); box-shadow: 0 0 30px rgba(245,197,24,0.12); }
+    .podium-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .podium-card.p1::before { background: linear-gradient(90deg, var(--gold), #ffe97a); }
+    .podium-card.p2::before { background: linear-gradient(90deg, var(--silver), #d0d8e8); }
+    .podium-card.p3::before { background: linear-gradient(90deg, var(--bronze), #e8a060); }
+    .podium-pos { font-size: 2.4rem; font-weight: 800; line-height: 1; margin-bottom: 6px; }
+    .p1 .podium-pos { color: var(--gold); } .p2 .podium-pos { color: var(--silver); } .p3 .podium-pos { color: var(--bronze); }
+    .podium-medal { font-size: 1.6rem; margin-bottom: 6px; }
+    .podium-name { font-size: 1rem; font-weight: 700; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .podium-car { font-size: 0.72rem; color: var(--muted); margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .podium-time { display: inline-block; font-size: 0.82rem; font-weight: 600; font-variant-numeric: tabular-nums; background: rgba(255,255,255,0.06); border-radius: 6px; padding: 4px 10px; }
+    .podium-sub { margin-top: 6px; font-size: 0.72rem; color: var(--muted); }
+
+    /* STATS STRIP */
+    .stats-strip { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px; margin: 0 0 32px; scrollbar-width: none; }
+    .stats-strip::-webkit-scrollbar { display: none; }
+    .stat-pill { flex-shrink: 0; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; text-align: center; min-width: 120px; }
+    .stat-pill .val { font-size: 1.5rem; font-weight: 800; color: var(--accent2); display: block; }
+    .stat-pill .lbl { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-top: 2px; }
+
+    /* TABLE */
+    .section-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .table-wrap { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+    .results-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .results-table thead tr { background: rgba(255,255,255,0.04); border-bottom: 1px solid var(--border); }
+    .results-table th { padding: 12px 16px; text-align: left; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+    .results-table td { padding: 13px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .results-table tbody tr:last-child td { border-bottom: none; }
+    .results-table tbody tr { transition: background var(--t); }
+    .results-table tbody tr:hover { background: var(--card-h); }
+
+    .pos-badge { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; }
+    .pos-1 { background: rgba(245,197,24,0.18); color: var(--gold); }
+    .pos-2 { background: rgba(168,178,193,0.16); color: var(--silver); }
+    .pos-3 { background: rgba(205,127,50,0.18); color: var(--bronze); }
+    .pos-n { background: rgba(255,255,255,0.06); color: var(--muted); }
+
+    .driver-name { font-weight: 600; }
+    .car-chip { font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+    .time-cell { font-variant-numeric: tabular-nums; font-weight: 500; white-space: nowrap; }
+    .best-lap { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--accent2); white-space: nowrap; }
+    .avg-lap { font-variant-numeric: tabular-nums; font-size: 0.83rem; color: var(--muted); }
+    .diff-time { font-size: 0.78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+    .laps-cell { white-space: nowrap; }
+    .cut-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 0.7rem; font-weight: 700; background: rgba(245,158,11,0.18); color: var(--yellow); border-radius: 5px; padding: 2px 6px; margin-left: 4px; }
+    .cut-badge.no-cut { background: rgba(34,197,94,0.12); color: var(--green); }
+
+    .crash-cell { font-weight: 600; white-space: nowrap; }
+    .crash-high { color: #f87171; } .crash-mid { color: var(--yellow); } .crash-low { color: var(--green); }
+
+    .dnf-row td { opacity: 0.55; }
+    .dnf-tag { display: inline-block; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; background: rgba(232,65,24,0.2); color: var(--accent); border-radius: 5px; padding: 2px 6px; margin-left: 6px; vertical-align: middle; }
+
+    /* FOOTER */
+    .footer { text-align: center; padding: 28px 0 14px; font-size: 0.75rem; color: var(--muted); border-top: 1px solid var(--border); }
+    .footer a { color: var(--accent); }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.55s ease both; }
+    .results-table tbody tr { animation: fadeUp 0.4s ease both; }
+    .results-table tbody tr:nth-child(1)  { animation-delay: 0.05s; }
+    .results-table tbody tr:nth-child(2)  { animation-delay: 0.10s; }
+    .results-table tbody tr:nth-child(3)  { animation-delay: 0.15s; }
+    .results-table tbody tr:nth-child(4)  { animation-delay: 0.18s; }
+    .results-table tbody tr:nth-child(5)  { animation-delay: 0.21s; }
+    .results-table tbody tr:nth-child(6)  { animation-delay: 0.24s; }
+    .results-table tbody tr:nth-child(7)  { animation-delay: 0.27s; }
+    .results-table tbody tr:nth-child(8)  { animation-delay: 0.30s; }
+    .results-table tbody tr:nth-child(9)  { animation-delay: 0.33s; }
+    .results-table tbody tr:nth-child(10) { animation-delay: 0.36s; }
+    .results-table tbody tr:nth-child(11) { animation-delay: 0.39s; }
+
+    @media (max-width: 768px) {
+      .results-table th.hide-sm, .results-table td.hide-sm { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero fade-up">
+    <div class="hero-tag">&#127937; Carrera Finalizada</div>
+    <h1>Toay La Pampa H22</h1>
+    <div class="hero-meta">
+      <span>&#128197; 16 Sep 2026 &middot; 23:16 hs</span>
+      <span>&#127950; TN C3</span>
+      <span>&#128290; 12 vueltas</span>
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-bottom: 28px;">
+    <a class="nav-back" href="/">&#8592; Volver al inicio</a>
+  </div>
+
+  <div class="container">
+    <p class="podium-title">&#127942; Podio</p>
+    <div class="podium-grid" id="podium-grid"></div>
+
+    <div class="stats-strip fade-up" id="stats-strip" style="animation-delay:0.15s"></div>
+
+    <p class="section-title">Clasificaci&oacute;n Final</p>
+    <div class="table-wrap fade-up" style="animation-delay:0.2s">
+      <div style="overflow-x:auto">
+        <table class="results-table" id="results-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Piloto</th>
+              <th class="hide-sm">Auto</th>
+              <th>Tiempo Total</th>
+              <th class="hide-sm">Diferencia</th>
+              <th>Vueltas</th>
+              <th>Mejor Vuelta</th>
+              <th class="hide-sm">V. Limpia Prom.</th>
+              <th>Crashes</th>
+            </tr>
+          </thead>
+          <tbody id="results-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Fuente: <a href="https://br.assettohosting.com:10031/results/2026_9_16_23_16_RACE" target="_blank" rel="noopener">br.assettohosting.com</a>
+    &nbsp;&middot;&nbsp; Zero2 SimRacing
+  </div>
+
+  <script>
+    const RACE_DATA = {
+      "race": {
+        "name": "Toay La Pampa H22 - Toay LA Pampa H22",
+        "date": "2026-09-16T23:16:00-03:00",
+        "source": "https://br.assettohosting.com:10031/results/2026_9_16_23_16_RACE"
+      },
+      "results": [
+        { "position": 1,  "driver": "Marcelo",           "steamId": "76561199220716165", "car": "TN C3 - Honda Civic 2025",       "totalRaceTime": "00:16:39.664", "numLaps": 12, "cuts": 0, "bestLap": "01:21.995", "tyre": "NA C3", "averageCleanLap": "01:23.075", "crashes": 12 },
+        { "position": 2,  "driver": "Matimedina",         "steamId": "76561199885997236", "car": "TN C3 - Volkswagen Virtus 2025", "totalRaceTime": "00:16:41.636", "numLaps": 12, "cuts": 0, "bestLap": "01:22.025", "tyre": "NA C3", "averageCleanLap": "01:22.958", "crashes": 4  },
+        { "position": 3,  "driver": "Gonzalo Giordana",   "steamId": "76561198435387680", "car": "TN C3 - Ford Focus 2025",        "totalRaceTime": "00:16:42.638", "numLaps": 12, "cuts": 0, "bestLap": "01:22.348", "tyre": "NA C3", "averageCleanLap": "01:23.172", "crashes": 7  },
+        { "position": 4,  "driver": "Mateo Vil\u00e1",    "steamId": "76561199089855375", "car": "TN C3 - Honda Civic 2025",       "totalRaceTime": "00:16:44.249", "numLaps": 12, "cuts": 0, "bestLap": "01:21.913", "tyre": "NA C3", "averageCleanLap": "01:23.436", "crashes": 10 },
+        { "position": 5,  "driver": "Adrian Kaluk",       "steamId": "76561199046981621", "car": "TN C3 - Honda Civic 2025",       "totalRaceTime": "00:16:50.004", "numLaps": 12, "cuts": 0, "bestLap": "01:23.295", "tyre": "NA C3", "averageCleanLap": "01:23.880", "crashes": 5  },
+        { "position": 6,  "driver": "ZERO2 ZequePrieto",  "steamId": "76561198981917201", "car": "TN C3 - Chevrolet Cruze 2025",   "totalRaceTime": "00:17:24.935", "numLaps": 12, "cuts": 2, "bestLap": "01:24.534", "tyre": "NA C3", "averageCleanLap": "01:26.141", "crashes": 8  },
+        { "position": 7,  "driver": "P.Sifuentes",        "steamId": "76561198688287533", "car": "TN C3 - Ford Focus 2025",        "totalRaceTime": "00:17:24.977", "numLaps": 12, "cuts": 2, "bestLap": "01:23.364", "tyre": "NA C3", "averageCleanLap": "01:25.966", "crashes": 8  },
+        { "position": 8,  "driver": "Alan Torres",        "steamId": "76561199052109633", "car": "TN C3 - Honda Civic 2025",       "totalRaceTime": "00:17:27.147", "numLaps": 12, "cuts": 1, "bestLap": "01:24.404", "tyre": "NA C3", "averageCleanLap": "01:26.326", "crashes": 8  },
+        { "position": 9,  "driver": "Diego Piedrabuena",  "steamId": "76561199866240772", "car": "TN C3 - Citroen Elysee 2025",    "totalRaceTime": "00:16:49.720", "numLaps": 10, "cuts": 0, "bestLap": "01:22.676", "tyre": "NA C3", "averageCleanLap": "01:35.495", "crashes": 4  },
+        { "position": 10, "driver": "Emilio Olivera",     "steamId": "76561198859645059", "car": "TN C3 - Toyota Corolla 2025",    "totalRaceTime": "00:07:40.807", "numLaps": 5,  "cuts": 1, "bestLap": "01:27.891", "tyre": "NA C3", "averageCleanLap": "01:29.438", "crashes": 6  },
+        { "position": 11, "driver": "Remo Piedrabuena",   "steamId": "76561198282014668", "car": "TN C3 - Ford Focus 2025",        "totalRaceTime": "00:17:09.898", "numLaps": 5,  "cuts": 0, "bestLap": "01:24.273", "tyre": "NA C3", "averageCleanLap": "01:32.035", "crashes": 0  }
+      ]
+    };
+
+    const FULL_LAPS = 12;
+
+    function timeToMs(str) {
+      const parts = str.split(':');
+      if (parts.length === 3) return (+parts[0]) * 3600000 + (+parts[1]) * 60000 + parseFloat(parts[2]) * 1000;
+      return (+parts[0]) * 60000 + parseFloat(parts[1]) * 1000;
+    }
+
+    function msToDiff(ms) {
+      if (ms <= 0) return '\u2014';
+      const s = Math.floor(ms / 1000);
+      const ms2 = Math.round(ms % 1000);
+      const m = Math.floor(s / 60);
+      const ss = s % 60;
+      if (m > 0) return '+' + m + ':' + String(ss).padStart(2,'0') + '.' + String(ms2).padStart(3,'0');
+      return '+' + ss + '.' + String(ms2).padStart(3,'0');
+    }
+
+    function carShort(car) { return car.replace('TN C3 - ', ''); }
+    function crashClass(n) {
+      if (n >= 8) return 'crash-high';
+      if (n >= 4) return 'crash-mid';
+      return 'crash-low';
+    }
+
+    /* Podium */
+    const medals = ['\uD83E\uDD47','\uD83E\uDD48','\uD83E\uDD49'];
+    const pClass  = ['p1','p2','p3'];
+    const podiumGrid = document.getElementById('podium-grid');
+    const leaderMs = timeToMs(RACE_DATA.results[0].totalRaceTime);
+
+    RACE_DATA.results.slice(0, 3).forEach((r, i) => {
+      const diffMs = timeToMs(r.totalRaceTime) - leaderMs;
+      const card = document.createElement('div');
+      card.className = 'podium-card ' + pClass[i] + ' fade-up';
+      card.style.animationDelay = (0.08 + i * 0.06) + 's';
+      card.innerHTML =
+        '<div class="podium-medal">' + medals[i] + '</div>' +
+        '<div class="podium-pos">' + r.position + '</div>' +
+        '<div class="podium-name">' + r.driver + '</div>' +
+        '<div class="podium-car">' + carShort(r.car) + '</div>' +
+        '<div class="podium-time">' + r.totalRaceTime.replace('00:','') + '</div>' +
+        (i === 0
+          ? '<div class="podium-sub" style="color:var(--gold)">WINNER</div>'
+          : '<div class="podium-sub" style="color:var(--accent2)">' + msToDiff(diffMs) + '</div>') +
+        '<div class="podium-sub">Mejor: <span style="color:var(--accent2)">' + r.bestLap + '</span></div>';
+      podiumGrid.appendChild(card);
+    });
+
+    /* Stats */
+    const strip = document.getElementById('stats-strip');
+    const fastestLap = RACE_DATA.results.reduce((best, r) => timeToMs(r.bestLap) < timeToMs(best.bestLap) ? r : best);
+    const totalCrashes = RACE_DATA.results.reduce((a,r) => a + r.crashes, 0);
+    const totalCuts    = RACE_DATA.results.reduce((a,r) => a + r.cuts, 0);
+    const fullFinishers = RACE_DATA.results.filter(r => r.numLaps === FULL_LAPS).length;
+
+    [
+      { val: RACE_DATA.results.length, lbl: 'Pilotos' },
+      { val: fullFinishers,            lbl: 'Finalizaron' },
+      { val: fastestLap.bestLap,       lbl: '\u26A1 Vuelta R\u00e1pida' },
+      { val: totalCrashes,             lbl: 'Crashes' },
+      { val: totalCuts,                lbl: 'Cortes' },
+      { val: FULL_LAPS,                lbl: 'Vueltas' },
+    ].forEach(s => {
+      const el = document.createElement('div');
+      el.className = 'stat-pill';
+      el.innerHTML = '<span class="val">' + s.val + '</span><span class="lbl">' + s.lbl + '</span>';
+      strip.appendChild(el);
+    });
+
+    /* Table */
+    const tbody = document.getElementById('results-body');
+    RACE_DATA.results.forEach(r => {
+      const isDnf  = r.numLaps < FULL_LAPS;
+      const diffMs = isDnf ? 0 : timeToMs(r.totalRaceTime) - leaderMs;
+      const posCls = r.position <= 3 ? 'pos-' + r.position : 'pos-n';
+      const isFL   = r.driver === fastestLap.driver;
+      const tr = document.createElement('tr');
+      if (isDnf) tr.classList.add('dnf-row');
+      let diffHtml;
+      if (r.position === 1) diffHtml = '<span style="color:var(--gold)">L\u00edder</span>';
+      else if (isDnf)       diffHtml = '<span style="color:var(--accent)">+' + (FULL_LAPS - r.numLaps) + ' vtas</span>';
+      else                  diffHtml = msToDiff(diffMs);
+
+      tr.innerHTML =
+        '<td><span class="pos-badge ' + posCls + '">' + r.position + '</span></td>' +
+        '<td><span class="driver-name">' + r.driver + '</span>' + (isDnf ? '<span class="dnf-tag">DNF</span>' : '') + '</td>' +
+        '<td class="car-chip hide-sm">' + carShort(r.car) + '</td>' +
+        '<td class="time-cell">' + r.totalRaceTime.replace('00:','') + '</td>' +
+        '<td class="diff-time hide-sm">' + diffHtml + '</td>' +
+        '<td class="laps-cell">' + r.numLaps + '<span class="cut-badge' + (r.cuts === 0 ? ' no-cut' : '') + '">' + (r.cuts === 0 ? '\u2713' : '\u2702 ' + r.cuts) + '</span></td>' +
+        '<td class="best-lap">' + r.bestLap + (isFL ? ' <span title="Vuelta m\u00e1s r\u00e1pida" style="color:var(--accent)">\u26A1</span>' : '') + '</td>' +
+        '<td class="avg-lap hide-sm">' + r.averageCleanLap + '</td>' +
+        '<td class="crash-cell ' + crashClass(r.crashes) + '">' + r.crashes + '</td>';
+      tbody.appendChild(tr);
+    });
+  </script>
+</body>
+</html>
